@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy import ForeignKey
 
 db = SQLAlchemy()
 owner_dogs = db.Table('owner_dogs',
@@ -13,14 +14,15 @@ dog_breed = db.Table('dog_breed',
 )
 
 class Owner(db.Model):
+    __tablename__='owner'
     id = db.Column(db.Integer, primary_key=True)
     img_url = db.Column(db.String(200), unique=False, nullable=False)
     name = db.Column(db.String(120), unique=False, nullable=False)
     zipcode = db.Column(db.Integer, unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    dogs = db.relationship('Dogs', secondary=owner_dogs, lazy='subquery')
+    is_active = db.Column(db.Boolean(), unique=False, nullable=True)
+    # dogs = db.relationship('Dogs', secondary=owner_dogs, lazy='subquery')
 
 
     def __repr__(self):
@@ -31,9 +33,9 @@ class Owner(db.Model):
             "id": self.id,
             "img_url": self.img_url,
             "name": self.name,
-            "zipcode": self.name,
+            "zipcode": self.zipcode,
             "email": self.email,
-            "dogs":list(map(lambda x: x.serialize(), self.dogs))
+            # "dogs":list(map(lambda x: x.serialize(), self.dogs))
 
             # do not serialize the password, its a security breach
         }
@@ -45,6 +47,8 @@ class Dogs(db.Model):
     chip_number = db.Column(db.Integer, unique=True, nullable=False)
     weight= db.Column(db.Float(precision=2), unique=False, nullable=False)
     neutered_or_spayed= db.Column(db.Boolean(), unique=False, nullable=False)
+    owner_id = db.Column(db.Integer, ForeignKey('owner.id'), nullable=False)
+    owner = db.relationship('Owner', foreign_keys=[owner_id], backref=db.backref('dogs', lazy=True))
 
     def __repr__(self):
         return f'<Dog {self.chip_number}>'
