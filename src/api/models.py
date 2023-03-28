@@ -56,7 +56,7 @@ class Dogs(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "img_url": self.url,
+            "img_url": self.img_url,
             "name": self.name,
             "breed":list(map(lambda x: x.name, self.breed)),
             "chip_number": self.chip_number,
@@ -91,7 +91,7 @@ class Playdates(db.Model):
     owner2_id = db.Column(db.Integer, db.ForeignKey('owner.id'), nullable=False)
 
     def __repr__(self):
-        return f'<Playdate {self.id}>'
+        return f'<Playdates {self.id}>'
 
     def serialize(self):
         return {

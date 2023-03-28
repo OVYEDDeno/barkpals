@@ -28,6 +28,14 @@ def get_owner(owner_id):
         return jsonify({'message': 'Owner not found'}), 404
     return jsonify(owner.serialize()), 200
 
+@api.route('/owners', methods=['GET'])
+def get_all_owner():
+    owner_list = Owner.query.all()
+    owner_serialized = [owner.serialize() for owner in owner_list]
+    if owner_list is None:
+        return jsonify({'message': 'Owner not found'}), 404
+    return jsonify(owner_serialized), 200
+
 @api.route('/owner/<int:owner_id>', methods=['PUT'])
 def update_owner(owner_id):
     owner = Owner.query.get(owner_id)
@@ -67,6 +75,14 @@ def handle_dogs():
     db.session.add(new_dog)
     db.session.commit()
     return jsonify(new_dog.serialize()), 200
+
+@api.route('/dogs', methods=['GET'])
+def get_all_dogs():
+    dogs_list = Dogs.query.all()
+    dogs_serialized = [dogs.serialize() for dogs in dogs_list]
+    if dogs_list is None:
+        return jsonify({'message': 'Dogs not found'}), 404
+    return jsonify(dogs_serialized), 200
 
 @api.route('/dogs/<int:dog_id>', methods=['GET'])
 def get_dog(dog_id):
@@ -140,3 +156,47 @@ def delete_breeds(id):
     db.session.delete(breeds)
     db.session.commit()
     return jsonify({'message': f'breeds{breeds.id} was deleted'}), 201
+
+# PLAYDATES LINE START HERE
+@api.route('/playdates' , methods=['POST'])
+def Playdates():
+    request_body = request.get_json()
+    # owner=Owner.query.get(request_body['name'])
+    new_playdate=Playdates(
+        dog1_id=request_body['dog1_id'],
+        dog2_id = request_body['dog2_id'],
+        owner1_id=request_body['owner1_id'],
+        owner2_id = request_body['owner2_id'],
+        messages = request_body['messages'],)
+    db.session.add(new_playdate)
+    db.session.commit()
+    return jsonify(new_playdate.serialize()), 200
+
+# @api.route('/playdates/<int:breeds_id>', methods=['GET'])
+# def get_breeds(breeds_id):
+#     breeds = breeds.query.get(breeds_id)
+#     if breeds is None:
+#         return jsonify({'message': 'Breeds not found'}), 404
+#     return jsonify(breeds.serialize()), 200
+
+# @api.route('/breeds/<int:breeds_id>', methods=['PUT'])
+# def update_breeds(breeds_id):
+#     breeds = Breeds.query.get(breeds_id)
+#     if breeds is None:
+#         return jsonify({'message': 'Breeds not found'}), 404
+#     request_body = request.get_json()
+#     breeds.name = request_body.get('name', breeds.name)
+#     breeds.img_url = request_body.get('img_url', breeds.img_url)
+#     breeds.zipcode = request_body.get('zipcode', breeds.zipcode)
+#     breeds.email = request_body.get('email', breeds.email)
+#     db.session.commit()
+#     return jsonify(breeds.serialize()), 200
+    
+# @api.route('/breeds/<int:breeds_id>', methods=['DELETE'])
+# def delete_breeds(id):
+#     breeds = Breeds.query.get(id)
+#     if breeds is None:
+#         raise APIException("Breeds not found", 404)
+#     db.session.delete(breeds)
+#     db.session.commit()
+#     return jsonify({'message': f'breeds{breeds.id} was deleted'}), 201
