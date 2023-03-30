@@ -12,6 +12,11 @@ dog_breed = db.Table('dog_breed',
     db.Column('dog_id', db.Integer, db.ForeignKey('dogs.id'), primary_key=True),
     db.Column('breed_id', db.Integer, db.ForeignKey('breeds.id'), primary_key=True)
 )
+owner_dogs_playdates = db.Table('owner_dogs_playdates',
+    db.Column('owner_id', db.Integer, db.ForeignKey('owner.id'), unique=True, primary_key=True),
+    db.Column('dogs_id', db.Integer, db.ForeignKey('dogs.id'), unique=True, primary_key=True),
+    db.Column('playdates_id', db.Integer, db.ForeignKey('playdates.id'), unique=True, primary_key=True)
+)
 
 class Owner(db.Model):
     __tablename__='owner'
@@ -21,7 +26,6 @@ class Owner(db.Model):
     zipcode = db.Column(db.Integer, unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=True)
     # dogs = db.relationship('Dogs', secondary=owner_dogs, lazy='subquery')
 
 
@@ -85,10 +89,17 @@ class Breeds(db.Model):
 class Playdates(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     messages = db.relationship('Message', backref='playdate', lazy=True)
-    dog1_id = db.Column(db.Integer, db.ForeignKey('dogs.id'), nullable=False)
-    dog2_id = db.Column(db.Integer, db.ForeignKey('dogs.id'), nullable=False)
-    owner1_id = db.Column(db.Integer, db.ForeignKey('owner.id'), nullable=False)
-    owner2_id = db.Column(db.Integer, db.ForeignKey('owner.id'), nullable=False)
+    dog1_id = db.relationship('Dogs', secondary=owner_dogs_playdates, lazy='subquery')
+    dog2_id = db.relationship('Dogs', secondary=owner_dogs_playdates, lazy='subquery')
+    # dog2_id = db.Column(db.Integer, ForeignKey('dogs.id'), nullable=False)
+    # owner = db.relationship('Dogs', foreign_keys=[owner1_id], backref=db.backref('Owner', lazy=True))
+
+    owner1_id = db.relationship('Owner', secondary=owner_dogs_playdates, lazy='subquery')
+    # owner1_id = db.Column(db.Integer, ForeignKey('owner.id'), nullable=False)
+    # owner = db.relationship('Owner', foreign_keys=[owner1_id], backref=db.backref('dogs', lazy=True))
+    owner2_id = db.relationship('Owner', secondary=owner_dogs_playdates, lazy='subquery')
+    # owner2_id = db.Column(db.Integer, ForeignKey('owner.id'), nullable=False)
+    # owner = db.relationship('Owner', foreign_keys=[owner2_id], backref=db.backref('dogs', lazy=True))
 
     def __repr__(self):
         return f'<Playdates {self.id}>'
@@ -96,12 +107,14 @@ class Playdates(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "dog1": Dogs.query.get(self.dog1_id).serialize(),
-            "dog2": Dogs.query.get(self.dog2_id).serialize(),
-            "owner1": Owner.query.get(self.owner1_id).serialize(),
-            "owner2": Owner.query.get(self.owner2_id).serialize(),
+            "dog1_id": Dogs.query.get(self.dog1_id).serialize(),
+            "dog2_id": Dogs.query.get(self.dog2_id).serialize(),
+            "owner1_id": Owner.query.get(self.owner1_id).serialize(),
+            "owner2_id": Owner.query.get(self.owner2_id).serialize(),
             "messages": [message.serialize() for message in self.messages],
         }
+
+
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
