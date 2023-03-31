@@ -163,8 +163,6 @@ def Playdates():
     request_body = request.get_json()
     # owner=Owner.query.get(request_body['name'])
     new_playdate=Playdates(
-        dog1_id=request_body['dog1_id'],
-        dog2_id = request_body['dog2_id'],
         owner1_id=request_body['owner1_id'],
         owner2_id = request_body['owner2_id'],
         messages = request_body['messages'],)
