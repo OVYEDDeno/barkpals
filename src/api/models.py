@@ -88,24 +88,35 @@ class Breeds(db.Model):
 class Playdates(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     messages = db.relationship('Message', backref='playdate', lazy=True)
-    owner1_id = db.relationship('Owner', secondary=owner_dogs_playdates, lazy='subquery')
-    # owner1_id = db.Column(db.Integer, ForeignKey('owner.id'), nullable=False)
-    # owner = db.relationship('Owner', foreign_keys=[owner1_id], backref=db.backref('dogs', lazy=True))
-    owner2_id = db.relationship('Owner', secondary=owner_dogs_playdates, lazy='subquery')
-    # owner2_id = db.Column(db.Integer, ForeignKey('owner.id'), nullable=False)
-    # owner = db.relationship('Owner', foreign_keys=[owner2_id], backref=db.backref('dogs', lazy=True))
-
+    owners = db.relationship(
+        'Owner',
+        secondary=owner_dogs_playdates,
+        lazy='subquery'
+    )
+    
     def __repr__(self):
         return f'<Playdates {self.id}>'
 
     def serialize(self):
         return {
             "id": self.id,
-            "owner1_id": Owner.query.get(self.owner1_id).serialize(),
-            "owner2_id": Owner.query.get(self.owner2_id).serialize(),
+            "owner1_id": Owner.query.get(self.id).serialize(),
+            "owner2_id": Owner.query.get(self.id).serialize(),
             "messages": [message.serialize() for message in self.messages],
         }
 
+
+class PDRequest(db.Model):
+    """
+    User A swipes right
+    app checks for PDReq(), PDRequest() is created.
+    User B later swipes right
+    app checks for PDReq(), finds one, creates a Playdate()
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    sender = db.Column(db.Integer, db.ForeignKey("Owner"))
+    target = db.Column(db.Integer, db.ForeignKey("Owner"))
+    is_complete = db.Column(db.Boolean, default=False)
 
 
 class Message(db.Model):
