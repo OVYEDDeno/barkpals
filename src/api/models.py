@@ -22,7 +22,7 @@ class Owner(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     img_url = db.Column(db.String(200), unique=False, nullable=False)
     name = db.Column(db.String(120), unique=False, nullable=False)
-    zipcode = db.Column(db.Integer, unique=False, nullable=False)
+    zipcode = db.Column(db.String(120), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     # dogs = db.relationship('Dogs', secondary=owner_dogs, lazy='subquery')
