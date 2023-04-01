@@ -87,7 +87,6 @@ class Breeds(db.Model):
 
 class Playdates(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    messages = db.relationship('Message', backref='playdate', lazy=True)
     owners = db.relationship(
         'Owner',
         secondary=owner_dogs_playdates,
@@ -125,7 +124,9 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     sender_id = db.Column(db.Integer, db.ForeignKey('owner.id'), nullable=False)
+    sender= db.relationship("Owner")
     playdate_id = db.Column(db.Integer, db.ForeignKey('playdates.id'), nullable=False)
+    playdate = db.relationship("Playdates", backref= "message")
     
     def __repr__(self):
         return f'<Message {self.id}>'
