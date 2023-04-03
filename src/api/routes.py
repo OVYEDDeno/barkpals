@@ -128,6 +128,7 @@ def handle_breeds():
     db.session.add(new_breeds)
     db.session.commit()
     return jsonify(new_breeds.serialize()), 200
+
 @api.route('/breeds/<int:breeds_id>', methods=['GET'])
 def get_breeds(breeds_id):
     breeds = breeds.query.get(breeds_id)
@@ -170,31 +171,33 @@ def Playdates():
     db.session.commit()
     return jsonify(new_playdate.serialize()), 200
 
-# @api.route('/playdates/<int:breeds_id>', methods=['GET'])
-# def get_breeds(breeds_id):
-#     breeds = breeds.query.get(breeds_id)
-#     if breeds is None:
-#         return jsonify({'message': 'Breeds not found'}), 404
-#     return jsonify(breeds.serialize()), 200
+@api.route('/playdates/<int:playdates_id>' , methods=['GET'])
+def get_playdates(playdates_id):
+    playdates = playdates.query.get(playdates_id)
+    if playdates is None:
+        return jsonify({'message': 'playdates not found'}), 404
+    return jsonify(playdates.serialize()), 200
 
-# @api.route('/breeds/<int:breeds_id>', methods=['PUT'])
-# def update_breeds(breeds_id):
-#     breeds = Breeds.query.get(breeds_id)
-#     if breeds is None:
-#         return jsonify({'message': 'Breeds not found'}), 404
-#     request_body = request.get_json()
-#     breeds.name = request_body.get('name', breeds.name)
-#     breeds.img_url = request_body.get('img_url', breeds.img_url)
-#     breeds.zipcode = request_body.get('zipcode', breeds.zipcode)
-#     breeds.email = request_body.get('email', breeds.email)
-#     db.session.commit()
-#     return jsonify(breeds.serialize()), 200
-    
-# @api.route('/breeds/<int:breeds_id>', methods=['DELETE'])
-# def delete_breeds(id):
-#     breeds = Breeds.query.get(id)
-#     if breeds is None:
-#         raise APIException("Breeds not found", 404)
-#     db.session.delete(breeds)
-#     db.session.commit()
-#     return jsonify({'message': f'breeds{breeds.id} was deleted'}), 201
+
+@api.route('/playdates/<int:playdates_id>', methods=['PUT'])
+def update_playdates_id(playdates_id):
+    playdates_id = playdates_id.query.get(playdates_id)
+    if playdates_id is None:
+        return jsonify({'message': 'playdates_id not found'}), 404
+    request_body = request.get_json()
+    new_playdate=Playdates(
+        owner1_id=request_body['owner1_id'],
+        owner2_id = request_body['owner2_id'],
+        messages = request_body['messages'],)
+    db.session.add(new_playdate)
+    db.session.commit()
+    return jsonify(playdates_id.serialize()), 200
+
+@api.route('playdates/<int:playdates_id>', methods=['DELETE'])
+def delete_playdates(id):
+    playdates = playdates.query.get(id)
+    if playdates is None:
+        raise APIException("playdates not found", 404)
+    db.session.delete(playdates)
+    db.session.commit()
+    return jsonify({'message': f'playdates{playdates.id} was deleted'}), 201
